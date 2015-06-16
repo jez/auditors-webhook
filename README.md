@@ -31,6 +31,9 @@ $ npm install -g nodemon coffee-script
 Start the server:
 
 ```console
+$ coffee -wc . &
+
+# in another tab/split
 $ npm start
 ```
 
