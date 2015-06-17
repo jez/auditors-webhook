@@ -1,9 +1,10 @@
 {
   "name": "gh-auditors",
   "version": "0.0.0",
+  "description": "Post-commit code review tool for GitHub using the Webhook API.",
   "private": true,
   "scripts": {
-    "start": "nodemon ./bin/www.js"
+    "start": "./bin/start.sh"
   },
   "dependencies": {
     "body-parser": "~1.12.4",
