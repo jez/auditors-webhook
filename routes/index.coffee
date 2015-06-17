@@ -4,8 +4,6 @@ express = require 'express'
 request = require 'request'
 qs = require 'querystring'
 
-secrets = require '../secrets'
-
 router = express.Router()
 
 # GET home page.
@@ -18,7 +16,7 @@ router.get '/login', (req, res, next) ->
   uri = 'https://github.com/login/oauth/authorize'
   params =
     scope: 'repo'
-    client_id: secrets.GITHUB_CLIENT_ID
+    client_id: process.env.GITHUB_CLIENT_ID
 
   res.redirect "#{uri}?#{qs.stringify params}"
 
@@ -30,8 +28,8 @@ router.get '/callback', (req, res, next) ->
   uri = 'https://github.com/login/oauth/access_token'
 
   body =
-    client_id: secrets.GITHUB_CLIENT_ID
-    client_secret: secrets.GITHUB_CLIENT_SECRET
+    client_id: process.env.GITHUB_CLIENT_ID
+    client_secret: process.env.GITHUB_CLIENT_SECRET
     code: session_code
     accept: 'application/json'
 
@@ -47,7 +45,7 @@ router.get '/callback', (req, res, next) ->
 
 router.post '/postreceive', (req, res, next) ->
   repo = req.body.repository.full_name
-  q = { access_token: secrets.GITHUB_ACCESS_TOKEN }
+  q = { access_token: process.env.GITHUB_ACCESS_TOKEN }
   uri = "https://api.github.com/repos/#{repo}/issues?#{qs.stringify(q)}"
 
   requestsToHandle = 0
