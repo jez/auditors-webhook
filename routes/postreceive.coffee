@@ -11,8 +11,12 @@ parseAuditors = (commit) ->
   m = commit.message
 
   # space-or-comma-separated list of auditors
-  auditorStr = m.match(regex)[1].trim()
-  auditorStr.split /,?\s+/
+  matches = m.match(regex)
+  if matches
+    auditorStr = matches[1].trim()
+    auditorStr.split /,?\s+/
+  else
+    []
 
 
 # create request to GitHub, calling 'asyncCallback' when done (to trigger next call)
