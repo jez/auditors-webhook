@@ -2,6 +2,7 @@ _ = require 'underscore'
 
 express = require 'express'
 request = require 'request'
+async = request 'async'
 qs = require 'querystring'
 
 router = express.Router()
@@ -43,57 +44,6 @@ router.get '/callback', (req, res, next) ->
   request.post {uri: uri, body: body, json: true}, callback
 
 
-router.post '/postreceive', (req, res, next) ->
-  repo = req.body.repository.full_name
-  q = { access_token: process.env.GITHUB_ACCESS_TOKEN }
-  uri = "https://api.github.com/repos/#{repo}/issues?#{qs.stringify(q)}"
-
-  requestsToHandle = 0
-
-  # Each event can signal multiple commits
-  _.each req.body.commits, (commit, idx, arr) ->
-    regex = /^Auditors:\s*(.*)\s*$/m
-    m = commit.message
-
-    # space-or-comma-separated list of auditors
-    auditorStr = m.match(regex)[1].trim()
-    auditors = auditorStr.split /,?\s+/
-
-    callback = (err, _res, body) ->
-      # TODO handle and log errors better
-      console.log err
-      console.log body
-      if _res.statusCode != 201
-        res.sendStatus(_res.statusCode)
-        res.end()
-      else if requestsToHandle == 0
-        res.end()
-
-    # Each commit might assign multiple auditors
-    _.each auditors, (auditor) ->
-      console.log auditor
-      #cutOff = _.max [71, m.indexOf('\n')]
-      cutOff = m.indexOf('\n')
-
-      params =
-        title: "Audit for '#{m.slice(0, cutOff)}'"
-        body: """
-          #{m.slice(cutOff)}
-
-          __Discuss on the original commit's diff: #{commit.id.slice(0, 10)}__
-          /cc #{commit.author.username}
-          """
-        assignee: auditor
-        labels: ['audit']
-
-      console.log uri
-      requestsToHandle += 1
-      request.post {
-        uri: uri,
-        body: params,
-        json: true,
-        headers: { 'User-Agent': 'node.js' }
-      }, callback
-
+router.post '/postreceive', require('./postreceive')
 
 module.exports = router
