@@ -69,7 +69,13 @@ postreceive = (req, res, next) ->
   createAuditIssue = createAuditIssueWrapper uri
 
   # serially fire off async issue-creation calls
-  async.eachSeries audits, createAuditIssue, callback
+  async.eachSeries audits, createAuditIssue, (err) ->
+    if (err)
+      console.log err
+      res.statusCode 500
+      res.end()
+    else
+      res.end()
 
 
 module.exports = postreceive

@@ -187,6 +187,7 @@ That's it! You should be able to commit to any repo you configured with
 ## TODO
 
 - [ ] Better name :(
+  - And a snazy logo?
 - [ ] It's not using the "Secret" field in the Webhook setup to verify that
   postreceives are actually coming from GitHub.
 - [ ] Error handling and robustness has been overlooked.
