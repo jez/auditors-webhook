@@ -4,3 +4,4 @@ tags
 !/bin/start.js
 secrets.coffee
 .env
+.env.prod

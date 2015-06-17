@@ -12,21 +12,6 @@ commit to be reviewed is linked in the issue body.
 
 ### Development
 
-First up, you'll need to create an __[application on GitHub][gh-app]__
-to get an app `client_id` and `client_secret`. Fill in
-
-- "Homepage URL" with <http://localhost:5000>
-- "Authorization callback URL" with <http://localhost:5000/callback>
-
-Click "Register application". Once you have a client id and client secret, fill
-in the appropriate values in `.env.template` and rename it to `.env`.
-
-```console
-(Edit .env.template)
-
-$ mv .env.template .env
-```
-
 The development environment requires a Node.js development environment.
 
 ```console
@@ -47,6 +32,21 @@ or
 
 $ brew install heroku-toolbelt
 $ gem install foreman
+```
+
+Next up, you'll need to create an __[application on GitHub][gh-app]__
+to get an app `client_id` and `client_secret`. Fill in
+
+- "Homepage URL" with <http://localhost:5000>
+- "Authorization callback URL" with <http://localhost:5000/callback>
+
+Click "Register application". Once you have a client id and client secret, fill
+in the appropriate values in `.env.template` after renaming it to `.env`.
+
+```console
+$ cp .env.template .env
+
+(Edit .env)
 ```
 
 In development, we'll need a way to expose our localhost app to the Internet so
@@ -75,7 +75,8 @@ Take note of the `http` URL that ngrok spits out next to "Forwarding":
    Web Interface                 127.0.0.1:4040
 ```
 
-Using this URL, create a Webhook on GitHub for your repo by
+Using this URL, create a Webhook on GitHub for the repo you want to enable
+auditors on by
 
 1. navigation to your organization or repository settings
 1. finding the "Webhooks & Services" tab
@@ -108,6 +109,78 @@ That's it! You should be able to commit to any repo you configured with
 
 This app can be deployed with Heroku.
 
+```console
+$ git clone https://github.com/jez/auditors-webhook
+```
+
+Next, either install the [Heroku toolbelt][toolbelt], or make sure you have the
+[foreman][foreman] gem installed.
+
+```console
+Install the Heroku toolbelt package installer from Heroku
+
+or
+
+$ brew install heroku-toolbelt
+$ gem install foreman
+```
+
+You'll need to choose a name for your app on Heroku, then create it at the
+command line:
+
+```console
+$ heroku create <myapp's name>
+```
+
+Next up, you'll need to create an __[application on GitHub][gh-app]__
+to get an app `client_id` and `client_secret`. Fill in
+
+- "Homepage URL" with <http://MYAPP_NAME.herokuapp.com>
+- "Authorization callback URL" with <http://MYAPP_NAME.herokuapp.com/callback>
+
+Replace `MYAPP_NAME` as necessary. Click "Register application". Once you have
+a client id and client secret, fill in the appropriate values in `.env.template`
+after renaming it to `.env.prod`.
+
+```console
+$ cp .env.template .env.prod
+
+(Edit .env.prod)
+```
+
+Now push this config to Heroku:
+
+```console
+$ heroku config:push -e .env.prod
+```
+
+We are now safe to deploy the app to Heroku:
+
+```console
+$ git push heroku master
+```
+
+We have to create a Webhook on GitHub for the repo you want to enable auditors
+on by
+
+1. navigating to your organization or repository settings
+1. finding the "Webhooks & Services" tab
+1. setting "Payload URL" to `<your "Forwarding" URL>/postreceive`
+1. clicking add (the defaults are good for everything else)
+
+
+We're almost there. Last up, we need to get an access token so we can use the
+GitHub API.
+
+1. Go to <http://MYAPP_NAME.herokuapp.com>
+1. Click "Login with GitHub"
+1. Authorize the application
+1. Copy the access token and find the line in `.env.prod` where it needs to go (it
+   is commented out by default; uncomment it)
+1. Run `heroku config:push -e .env.prod` again
+
+That's it! You should be able to commit to any repo you configured with
+`Auditors: <GitHub username>` in the commit message and have issues be created.
 
 
 
