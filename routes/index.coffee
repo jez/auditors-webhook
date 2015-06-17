@@ -2,7 +2,7 @@ _ = require 'underscore'
 
 express = require 'express'
 request = require 'request'
-async = request 'async'
+async = require 'async'
 qs = require 'querystring'
 
 router = express.Router()
