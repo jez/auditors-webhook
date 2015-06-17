@@ -55,6 +55,7 @@ router.post '/postreceive', (req, res, next) ->
     regex = /^Auditors:\s*(.*)\s*$/m
     m = commit.message
 
+    # space-or-comma-separated list of auditors
     auditorStr = m.match(regex)[1].trim()
     auditors = auditorStr.split /,?\s+/
 
@@ -71,11 +72,17 @@ router.post '/postreceive', (req, res, next) ->
     # Each commit might assign multiple auditors
     _.each auditors, (auditor) ->
       console.log auditor
-      cutOff = _.max [71, m.indexOf('\n')]
+      #cutOff = _.max [71, m.indexOf('\n')]
+      cutOff = m.indexOf('\n')
 
       params =
         title: "Audit for '#{m.slice(0, cutOff)}'"
-        body: "#{m}\n\nCommit: #{commit.id.slice(0, 10)}"
+        body: """
+          #{m.slice(cutOff)}
+
+          __Discuss on the original commit's diff: #{commit.id.slice(0, 10)}__
+          /cc #{commit.author.username}
+          """
         assignee: auditor
         labels: ['audit']
 
