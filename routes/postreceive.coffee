@@ -1,7 +1,7 @@
 _ = require 'underscore'
 
 request = require 'request'
-async = request 'async'
+async = require 'async'
 qs = require 'querystring'
 
 
