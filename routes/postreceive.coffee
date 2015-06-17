@@ -38,8 +38,6 @@ createAuditIssueWrapper = (uri) ->
       labels: ['audit']
 
     requestCb = (err, _res, body) ->
-      console.log err
-      console.log body
       if _res.statusCode != 201
         # error, abort all subsequent calls
         asyncCallback err
