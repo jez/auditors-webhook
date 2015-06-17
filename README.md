@@ -13,8 +13,13 @@ commit to be reviewed is linked in the issue body.
 ### Development
 
 First up, you'll need to create an __[application on GitHub][gh-app]__
-to get an app `client_id` and `client_secret`. Once you have these, fill in the
-appropriate values in `.env.template` and rename it to `.env`.
+to get an app `client_id` and `client_secret`. Fill in
+
+- "Homepage URL" with <http://localhost:5000>
+- "Authorization callback URL" with <http://localhost:5000/callback>
+
+Click "Register application". Once you have a client id and client secret, fill
+in the appropriate values in `.env.template` and rename it to `.env`.
 
 ```console
 (Edit .env.template)
