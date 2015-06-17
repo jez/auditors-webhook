@@ -8,6 +8,41 @@ that has 'Auditors: ' in the message body. One issue is created for each auditor
 and each commit. The auditor is assigned on the issue, and the corresponding
 commit to be reviewed is linked in the issue body.
 
+
+## Usage
+
+### Write commit
+
+Once you've followed the [Setup](#setup) instructions below, you can add
+auditors to your commits by just adding the line `Auditors: username1 [username1
+...]` to your commit messages:
+
+![Auditors in commit message][audit-commit-message]
+
+### Browse issue
+
+When that commit gets pushed to the repo you configured the webhook for, it
+creates an issue that looks like this:
+
+![auditor issue][audit-issue]
+
+You can see that it...
+
+- creates an issue for every auditor on each commit, and assigns auditors to the
+  issues
+- links to the commit diff, so you can discuss the changes in line
+- adds the "audit" label
+- mentions the author, so they can see all open audits they're participating in
+
+### Review commit
+
+Most of the code review discussion should be on the GitHub page for that commit:
+
+![auditor commit][audit-commit]
+
+That's it! Follow the setup to get it working for your repositories.
+
+
 ## Setup
 
 ### Development
@@ -50,7 +85,7 @@ $ cp .env.template .env
 ```
 
 In development, we'll need a way to expose our localhost app to the Internet so
-that GitHub can hit it with it's webhooks. This can be done with [ngrok][ngrox].
+that GitHub can hit it with it's webhooks. This can be done with [ngrok][ngrok].
 
 ```console
 $ brew install ngrok
@@ -187,8 +222,6 @@ That's it! You should be able to commit to any repo you configured with
 ## TODO
 
 - [ ] Add usage information
-  - Screenshots of issues, commit messages
-  - How multiple commits/auditors work
   - Asks for public + private access
   - Meant to be a one-deploy:one-organization mapping
 - [ ] It's not using the "Secret" field in the Webhook setup to verify that
@@ -196,6 +229,11 @@ That's it! You should be able to commit to any repo you configured with
 - [ ] Better name :(
   - And a snazy logo?
 - [ ] SSL
+
+
+[audit-commit-message]: screenshots/audit-commit-message.png
+[audit-issue]: screenshots/audit-issue.png
+[audit-commit]: screenshots/audit-commit.png
 
 [gh-app]: https://github.com/settings/developers
 [toolbelt]: https://toolbelt.heroku.com/
