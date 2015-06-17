@@ -108,6 +108,7 @@ This app can be deployed with Heroku.
 
 ## TODO
 
+- [ ] Better name :(
 - [ ] It's not using the "Secret" field in the Webhook setup to verify that
   postreceives are actually coming from GitHub.
 - [ ] Error handling and robustness has been overlooked.
