@@ -10,39 +10,52 @@ commit to be reviewed is linked in the issue body.
 
 ## Setup
 
-There is still a little bit of work to be done before this is "production
-ready", but that doesn't mean you can't use it now.
+### Development
 
-### Install dependencies
+First up, you'll need to create an __[application on GitHub][gh-app]__
+to get an app `client_id` and `client_secret`. Once you have these, fill in the
+appropriate values in `.env.template` and rename it to `.env`.
 
-First up, you'll need to create a Developer Application on GitHub to get an app
-`client_id` and `client_secret`. Once you have these, fill in the appropriate
-values in `secrets.template.coffee` and rename it to `secrets.coffee`.
+```console
+(Edit .env.template)
 
-Next, assuming you have Node.js installed, run
+$ mv .env.template .env
+```
+
+The development environment requires a Node.js development environment.
 
 ```console
 $ git clone https://github.com/jez/auditors-webhook
 $ npm install
 
-$ npm install -g nodemon coffee-script
+# If you want a fancy development environment:
+$ npm install -g nodemon
 ```
 
-Start the server:
+Next, either install the [Heroku toolbelt][toolbelt], or make sure you have the
+[foreman][foreman] gem installed.
 
 ```console
-$ coffee -wc . &
+Install the Heroku toolbelt package installer from Heroku
 
-# in another tab/split
-$ npm start
+or
+
+$ brew install heroku-toolbelt
+$ gem install foreman
 ```
 
-We need to use `ngrok` to expose our app to the Internet, so that GitHub can hit
-it as a callback:
+In development, we'll need a way to expose our localhost app to the Internet so
+that GitHub can hit it with it's webhooks. This can be done with [ngrok][ngrox].
 
 ```console
 $ brew install ngrok
-$ ngrok 3000
+```
+
+`ngrok` works by giving us an arbitrary subdomain on `ngrok.com`. All traffic to
+this domain is forwarded to a port on our local computer. Start it with
+
+```console
+$ ngrok 5000
 ```
 
 Take note of the `http` URL that ngrok spits out next to "Forwarding":
@@ -57,19 +70,52 @@ Take note of the `http` URL that ngrok spits out next to "Forwarding":
    Web Interface                 127.0.0.1:4040
 ```
 
-And create a Webhook on GitHub for your repo by going to your organization or
-repository settings, finding the "Webhooks & Services" tab. You'll need to set
-Payload URL to `<your Forwarding URL>/postreceive` and click add (the defaults
-are good for everything else).
+Using this URL, create a Webhook on GitHub for your repo by
 
-That's it! You should be able to commit to that repo with `Auditors: <GitHub
-username>` in the commit message and have issues be created.
+1. navigation to your organization or repository settings
+1. finding the "Webhooks & Services" tab
+1. setting "Payload URL" to `<your "Forwarding" URL>/postreceive`
+1. clicking add (the defaults are good for everything else)
+
+
+Finally, start the server:
+
+```console
+$ foreman start
+```
+
+We're almost there. Last up, we need to get an access token so we can use the
+GitHub API.
+
+1. Go to <http://localhost:5000>
+1. Click "Login with GitHub"
+1. Authorize the application
+1. Copy the access token and find the line in `.env` where it needs to go (it
+   is commented out by default; uncomment it)
+
+Finally, restart the server.
+
+That's it! You should be able to commit to any repo you configured with
+`Auditors: <GitHub username>` in the commit message and have issues be created.
+
+
+### Production
+
+This app can be deployed with Heroku.
+
+
 
 
 ## TODO
 
-- [ ] There's no database right now, just config settings in `secrets.coffee`.
 - [ ] It's not using the "Secret" field in the Webhook setup to verify that
   postreceives are actually coming from GitHub.
 - [ ] Error handling and robustness has been overlooked.
+- [ ] Add usage information
+  - Screenshots of issues, commit messages
+  - How multiple commits/auditors work
 
+[gh-app]: https://github.com/settings/developers
+[toolbelt]: https://toolbelt.heroku.com/
+[foreman]: https://github.com/ddollar/foreman
+[ngrok]: https://ngrok.com/
