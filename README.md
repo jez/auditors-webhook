@@ -194,6 +194,9 @@ That's it! You should be able to commit to any repo you configured with
 - [ ] Add usage information
   - Screenshots of issues, commit messages
   - How multiple commits/auditors work
+  - Asks for public + private access
+  - Meant to be a one-deploy:one-organization mapping
+- [ ] SSL
 
 [gh-app]: https://github.com/settings/developers
 [toolbelt]: https://toolbelt.heroku.com/
