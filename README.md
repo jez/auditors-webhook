@@ -186,17 +186,15 @@ That's it! You should be able to commit to any repo you configured with
 
 ## TODO
 
-- [ ] Better name :(
-  - And a snazy logo?
-- [ ] It's not using the "Secret" field in the Webhook setup to verify that
-  postreceives are actually coming from GitHub.
-- [ ] Error handling and robustness has been overlooked.
-- [ ] Multiple commits/auditors is buggy right now (look into async.js)
 - [ ] Add usage information
   - Screenshots of issues, commit messages
   - How multiple commits/auditors work
   - Asks for public + private access
   - Meant to be a one-deploy:one-organization mapping
+- [ ] It's not using the "Secret" field in the Webhook setup to verify that
+  postreceives are actually coming from GitHub.
+- [ ] Better name :(
+  - And a snazy logo?
 - [ ] SSL
 
 [gh-app]: https://github.com/settings/developers

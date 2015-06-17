@@ -36,7 +36,6 @@ router.get '/callback', (req, res, next) ->
 
   callback = (err, _res, body) ->
     # TODO check that user has given us sufficent scope
-    # TODO persist token in database
     if not err
       console.log body
       res.render 'index', { access_token: body.access_token }
