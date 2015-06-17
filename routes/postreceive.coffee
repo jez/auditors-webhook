@@ -34,7 +34,7 @@ createAuditIssueWrapper = (uri) ->
         __Discuss on the original commit's diff: #{audit.commit.id.slice(0, 10)}__
         /cc @#{audit.commit.author.username}
         """
-      assignee: auditor
+      assignee: audit.auditor
       labels: ['audit']
 
     requestCb = (err, _res, body) ->
