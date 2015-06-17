@@ -1,0 +1,7 @@
+extends layout
+
+block content
+  h1 Auditors Webhook
+  p: a(href="/login") Login with GitHub
+  if access_token
+    p Your new access token is #{access_token}. Please add this to your secrets file and restart the server.
