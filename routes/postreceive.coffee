@@ -1,4 +1,5 @@
 _ = require 'underscore'
+crypto = require 'crypto'
 
 request = require 'request'
 async = require 'async'
@@ -53,13 +54,30 @@ createAuditIssueWrapper = (uri) ->
     }, requestCb
 
 
+verify_signature = (payload, expected) ->
+  actual = crypto
+    .createHmac('sha1', process.env.WEBHOOK_SECRET)
+    .update(payload)
+    .digest('hex')
+
+  console.log "Expected: #{expected}"
+  console.log "Actual: #{actual}"
+  return expected == actual
+
+
 postreceive = (req, res, next) ->
   # ping event
   if req.headers['x-github-event'] == 'ping'
-    console.log 'ping event received.'
-    console.log req.body.zen
+    console.log "ping event received.\n#{req.body.zen}"
     res.status(204).end()
     return
+
+  # only deal with push events
+  if req.headers['x-github-event'] != 'push'
+    return
+
+  if not verify_signature req.body, req.headers['x-hub-signature']
+    console.log 'Signatures invalid, continuing anyway YOLO'
 
   repo = req.body.repository.full_name
   q = { access_token: process.env.GITHUB_ACCESS_TOKEN }
@@ -81,8 +99,7 @@ postreceive = (req, res, next) ->
   async.eachSeries audits, createAuditIssue, (err) ->
     if (err)
       console.log err
-      res.statusCode 500
-      res.end()
+      res.status(500).end()
     else
       res.end()
 
