@@ -6,6 +6,21 @@ async = require 'async'
 qs = require 'querystring'
 
 
+# Compute hash of payload to determine validity of response
+verify_signature = (payload, expected) ->
+  # signature invalid if one is present but the other isn't
+  return false if expected? != process.env.WEBHOOK_SECRET?
+  # only verify if both are present
+  return true unless expected?
+
+  actual = crypto
+    .createHmac 'sha1', process.env.WEBHOOK_SECRET
+    .update JSON.stringify(payload)
+    .digest 'hex'
+
+  return expected == "sha1=#{actual}"
+
+
 # return an array of strings
 parseAuditors = (commit) ->
   regex = /^Auditors:\s*(.*)\s*$/m
@@ -54,17 +69,6 @@ createAuditIssueWrapper = (uri) ->
     }, requestCb
 
 
-verify_signature = (payload, expected) ->
-  actual = crypto
-    .createHmac 'sha1', process.env.WEBHOOK_SECRET
-    .update JSON.stringify(payload)
-    .digest 'hex'
-
-  console.log "Expected: #{expected}"
-  console.log "Actual: #{actual}"
-  return expected == actual
-
-
 postreceive = (req, res, next) ->
   # ping event
   if req.headers['x-github-event'] == 'ping'
@@ -77,7 +81,8 @@ postreceive = (req, res, next) ->
     return
 
   if not verify_signature req.body, req.headers['x-hub-signature']
-    console.log 'Signatures invalid, continuing anyway YOLO'
+    console.log 'Signatures invalid aborting.'
+    res.status(403).end()
 
   repo = req.body.repository.full_name
   q = { access_token: process.env.GITHUB_ACCESS_TOKEN }
