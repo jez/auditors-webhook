@@ -45,6 +45,98 @@ That's it! Follow the setup to get it working for your repositories.
 
 ## Setup
 
+There are two ways to get set up; you can get set up for [The Real
+World](#the-real-world) or for [development](#development).
+
+### The Real World
+
+This app can be deployed with Heroku.
+
+```console
+$ git clone https://github.com/jez/auditors-webhook
+```
+
+Next, either install the [Heroku toolbelt][toolbelt], or make sure you have the
+[foreman][foreman] gem installed.
+
+```console
+Install the Heroku toolbelt package installer from Heroku
+
+or
+
+$ brew install heroku-toolbelt
+$ gem install foreman
+```
+
+You'll need to choose a name for your app on Heroku, then create it at the
+command line:
+
+```console
+$ heroku create <myapp's name>
+```
+
+Next up, you'll need to create an __[application on GitHub][gh-app]__
+to get an app `client_id` and `client_secret`. Fill in
+
+- "Homepage URL" with <http://MYAPP_NAME.herokuapp.com>
+- "Authorization callback URL" with <http://MYAPP_NAME.herokuapp.com/callback>
+
+Replace `MYAPP_NAME` as necessary. Click "Register application". Once you have
+a client id and client secret, fill in the appropriate values in `.env.template`
+after renaming it to `.env.prod`.
+
+```console
+$ cp .env.template .env.prod
+
+(Edit .env.prod)
+```
+
+Now push this config to Heroku:
+
+```console
+$ heroku config:push -e .env.prod
+```
+
+We are now safe to deploy the app to Heroku:
+
+```console
+$ git push heroku master
+```
+
+We have to create a Webhook on GitHub for the repo you want to enable auditors
+on by
+
+1. navigating to your organization or repository settings
+1. finding the "Webhooks & Services" tab
+1. setting "Payload URL" to `<your "Forwarding" URL>/postreceive`
+1. clicking add (the defaults are good for everything else)
+
+
+We're almost there. Last up, we need to get an access token so we can use the
+GitHub API.
+
+1. Go to <http://MYAPP_NAME.herokuapp.com>
+1. Click "Login with GitHub"
+1. Authorize the application
+1. Copy the access token and find the line in `.env.prod` where it needs to go (it
+   is commented out by default; uncomment it)
+1. Run `heroku config:push -e .env.prod` again
+
+We're also going to want to be able to verify that requests from GitHub are
+actually coming from GitHub:
+
+1. Run `ruby -rsecurerandom -e 'puts SecureRandom.hex(20)` and note the output
+   (or just come up with some random string).
+1. Uncomment `WEBHOOK_SECRET` from `.env` and add this string there.
+1. Add this string to the "Secret" field where you configured your repo (it was
+   on the "Webhooks & Services" tab on GitHub)
+1. Run `heroku config:push -e .env.prod` to sync the config with Heroku
+
+
+That's it! You should be able to commit to any repo you configured with
+`Auditors: <GitHub username>` in the commit message and have issues be created.
+
+
 ### Development
 
 The development environment requires a Node.js development environment.
@@ -149,104 +241,22 @@ That's it! You should be able to commit to any repo you configured with
 `Auditors: <GitHub username>` in the commit message and have issues be created.
 
 
-### Production
+## Further Notes
 
-This app can be deployed with Heroku.
+It's 2015; you should be using HTTPS. Here are some options:
 
-```console
-$ git clone https://github.com/jez/auditors-webhook
-```
-
-Next, either install the [Heroku toolbelt][toolbelt], or make sure you have the
-[foreman][foreman] gem installed.
-
-```console
-Install the Heroku toolbelt package installer from Heroku
-
-or
-
-$ brew install heroku-toolbelt
-$ gem install foreman
-```
-
-You'll need to choose a name for your app on Heroku, then create it at the
-command line:
-
-```console
-$ heroku create <myapp's name>
-```
-
-Next up, you'll need to create an __[application on GitHub][gh-app]__
-to get an app `client_id` and `client_secret`. Fill in
-
-- "Homepage URL" with <http://MYAPP_NAME.herokuapp.com>
-- "Authorization callback URL" with <http://MYAPP_NAME.herokuapp.com/callback>
-
-Replace `MYAPP_NAME` as necessary. Click "Register application". Once you have
-a client id and client secret, fill in the appropriate values in `.env.template`
-after renaming it to `.env.prod`.
-
-```console
-$ cp .env.template .env.prod
-
-(Edit .env.prod)
-```
-
-Now push this config to Heroku:
-
-```console
-$ heroku config:push -e .env.prod
-```
-
-We are now safe to deploy the app to Heroku:
-
-```console
-$ git push heroku master
-```
-
-We have to create a Webhook on GitHub for the repo you want to enable auditors
-on by
-
-1. navigating to your organization or repository settings
-1. finding the "Webhooks & Services" tab
-1. setting "Payload URL" to `<your "Forwarding" URL>/postreceive`
-1. clicking add (the defaults are good for everything else)
+- If you're working on your laptop, you can [set up stress free HTTPS on OS
+  X][osx-https]
+- If you have a custom domain name, [Cloudflare will give you free
+  HTTPS][cloudflare-https]
+- Heroku has some addons for adding HTTPS
+- [Let's Encrypt][lets-encrypt-https] will be giving out free certificates [soon][lets-encrypt]!
+- StartSSL gives out free [SSL certificates][startssl]
 
 
-We're almost there. Last up, we need to get an access token so we can use the
-GitHub API.
+## LICENSE
 
-1. Go to <http://MYAPP_NAME.herokuapp.com>
-1. Click "Login with GitHub"
-1. Authorize the application
-1. Copy the access token and find the line in `.env.prod` where it needs to go (it
-   is commented out by default; uncomment it)
-1. Run `heroku config:push -e .env.prod` again
-
-We're also going to want to be able to verify that requests from GitHub are
-actually coming from GitHub:
-
-1. Run `ruby -rsecurerandom -e 'puts SecureRandom.hex(20)` and note the output
-   (or just come up with some random string).
-1. Uncomment `WEBHOOK_SECRET` from `.env` and add this string there.
-1. Add this string to the "Secret" field where you configured your repo (it was
-   on the "Webhooks & Services" tab on GitHub)
-1. Run `heroku config:push -e .env.prod` to sync the config with Heroku
-
-
-That's it! You should be able to commit to any repo you configured with
-`Auditors: <GitHub username>` in the commit message and have issues be created.
-
-
-
-## TODO
-
-- [ ] Add usage information
-  - Asks for public + private access
-  - Meant to be a one-deploy:one-organization mapping
-- [ ] Better name :(
-  - And a snazy logo?
-- [ ] SSL
+MIT License. See [LICENSE](LICENSE)
 
 
 [audit-commit-message]: screenshots/audit-commit-message.png
@@ -257,3 +267,9 @@ That's it! You should be able to commit to any repo you configured with
 [toolbelt]: https://toolbelt.heroku.com/
 [foreman]: https://github.com/ddollar/foreman
 [ngrok]: https://ngrok.com/
+
+[osx-https]: https://gist.github.com/jed/6147872
+[cloudflare-https]: https://www.cloudflare.com/ssl
+[lets-encrypt-https]: https://letsencrypt.org/
+[lets-encrypt]: https://letsencrypt.org/2015/06/16/lets-encrypt-launch-schedule.html
+[startssl]: https://www.startssl.com/
