@@ -1,17 +1,26 @@
 # Auditors Webhook
 
-This is a simple Node.js + Express app that creates issues to be used for
-post-commit code review.
+Sometimes, the change you've made to a project is too small to make a
+full-fledged pull request, but you'd still like a pair of eyes to review it at
+some point. This project gives you an option for handling exactly this scenario.
+You push your changes, assign someone to "audit" them, and they can take a look
+when they get the chance while your changes land immediately.
 
-When set up, this app uses GitHub webhooks to create an issue for each commit
-that has 'Auditors: ' in the message body. One issue is created for each auditor
-and each commit. The auditor is assigned on the issue, and the corresponding
-commit to be reviewed is linked in the issue body.
+It works as a simple Express.js app that creates issues to track post-commit
+code review requests.
+
+When set up, it uses the GitHub webhooks and issues APIs to create an issue for
+each commit that has 'Auditors: ' in the message body at the start of a line.
+One issue is created for each auditor and each commit. The auditor is assigned
+on the issue, and the corresponding commit to be reviewed is linked in the issue
+body.
 
 
 ## Usage
 
-### Write commit
+Here's how it looks in real life.
+
+### Write your commit
 
 Once you've followed the [Setup](#setup) instructions below, you can add
 auditors to your commits by just adding the line `Auditors: username1 [username1
@@ -19,7 +28,7 @@ auditors to your commits by just adding the line `Auditors: username1 [username1
 
 ![Auditors in commit message][audit-commit-message]
 
-### Browse issue
+### Browse the issue
 
 When that commit gets pushed to the repo you configured the webhook for, it
 creates an issue that looks like this:
@@ -34,13 +43,15 @@ You can see that it...
 - adds the "audit" label
 - mentions the author, so they can see all open audits they're participating in
 
-### Review commit
+### Review the commit
 
-Most of the code review discussion should be on the GitHub page for that commit:
+When the auditor gets around to it, they can use GitHub's normal commit view to
+see your changes. The code review discussion should be on the GitHub page for
+that commit (as opposed to on the audit issue):
 
 ![auditor commit][audit-commit]
 
-That's it! Follow the setup to get it working for your repositories.
+That's it! Follow the setup below to get it working for your repositories.
 
 
 ## Setup
