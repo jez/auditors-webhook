@@ -54,6 +54,11 @@ createAuditIssueWrapper = (uri) ->
 
 
 postreceive = (req, res, next) ->
+  # ping event
+  if 'hook' in req.body and 'zen' in req.body
+    res.status(204).end()
+    return
+
   repo = req.body.repository.full_name
   q = { access_token: process.env.GITHUB_ACCESS_TOKEN }
   uri = "https://api.github.com/repos/#{repo}/issues?#{qs.stringify(q)}"
