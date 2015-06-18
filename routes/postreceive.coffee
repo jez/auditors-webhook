@@ -55,7 +55,7 @@ createAuditIssueWrapper = (uri) ->
 
 postreceive = (req, res, next) ->
   # ping event
-  if 'hook' in req.body and 'zen' in req.body
+  if req.headers['X-GitHub-Event'] == 'ping'
     res.status(204).end()
     return
 
