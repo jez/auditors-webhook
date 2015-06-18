@@ -119,13 +119,13 @@ auditors on by
 1. clicking add (the defaults are good for everything else)
 
 
-Finally, start the server:
+Start the server:
 
 ```console
 $ foreman start
 ```
 
-We're almost there. Last up, we need to get an access token so we can use the
+We're almost there. We need to get an access token so we can use the
 GitHub API.
 
 1. Go to <http://localhost:5000>
@@ -134,7 +134,16 @@ GitHub API.
 1. Copy the access token and find the line in `.env` where it needs to go (it
    is commented out by default; uncomment it)
 
-Finally, restart the server.
+We're also going to want to be able to verify that requests from GitHub are
+actually coming from GitHub:
+
+1. Run `ruby -rsecurerandom -e 'puts SecureRandom.hex(20)` and note the output
+   (or just come up with some random string).
+1. Uncomment `WEBHOOK_SECRET` from `.env` and add this string there.
+1. Add this string to the "Secret" field where you configured your repo (it was
+   on the "Webhooks & Services" tab on GitHub)
+
+Restart the server one last time.
 
 That's it! You should be able to commit to any repo you configured with
 `Auditors: <GitHub username>` in the commit message and have issues be created.
@@ -214,6 +223,17 @@ GitHub API.
    is commented out by default; uncomment it)
 1. Run `heroku config:push -e .env.prod` again
 
+We're also going to want to be able to verify that requests from GitHub are
+actually coming from GitHub:
+
+1. Run `ruby -rsecurerandom -e 'puts SecureRandom.hex(20)` and note the output
+   (or just come up with some random string).
+1. Uncomment `WEBHOOK_SECRET` from `.env` and add this string there.
+1. Add this string to the "Secret" field where you configured your repo (it was
+   on the "Webhooks & Services" tab on GitHub)
+1. Run `heroku config:push -e .env.prod` to sync the config with Heroku
+
+
 That's it! You should be able to commit to any repo you configured with
 `Auditors: <GitHub username>` in the commit message and have issues be created.
 
@@ -224,8 +244,6 @@ That's it! You should be able to commit to any repo you configured with
 - [ ] Add usage information
   - Asks for public + private access
   - Meant to be a one-deploy:one-organization mapping
-- [ ] It's not using the "Secret" field in the Webhook setup to verify that
-  postreceives are actually coming from GitHub.
 - [ ] Better name :(
   - And a snazy logo?
 - [ ] SSL
