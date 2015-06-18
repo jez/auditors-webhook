@@ -56,9 +56,9 @@ createAuditIssueWrapper = (uri) ->
 
 verify_signature = (payload, expected) ->
   actual = crypto
-    .createHmac('sha1', process.env.WEBHOOK_SECRET)
-    .update(payload)
-    .digest('hex')
+    .createHmac 'sha1', process.env.WEBHOOK_SECRET
+    .update JSON.stringify(payload)
+    .digest 'hex'
 
   console.log "Expected: #{expected}"
   console.log "Actual: #{actual}"
