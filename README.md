@@ -119,7 +119,7 @@ on by
 
 1. navigating to your organization or repository settings
 1. finding the "Webhooks & Services" tab
-1. setting "Payload URL" to `<your "Forwarding" URL>/postreceive`
+1. setting "Payload URL" to `<your "Forwarding" URL>/audit/opened`
 1. clicking add (the defaults are good for everything else)
 
 
@@ -218,7 +218,7 @@ auditors on by
 
 1. navigation to your organization or repository settings
 1. finding the "Webhooks & Services" tab
-1. setting "Payload URL" to `<your "Forwarding" URL>/postreceive`
+1. setting "Payload URL" to `<your "Forwarding" URL>/audit/opened`
 1. clicking add (the defaults are good for everything else)
 
 

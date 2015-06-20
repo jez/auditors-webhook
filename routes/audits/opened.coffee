@@ -1,24 +1,10 @@
 _ = require 'underscore'
-crypto = require 'crypto'
 
 request = require 'request'
 async = require 'async'
 qs = require 'querystring'
 
-
-# Compute hash of payload to determine validity of response
-verify_signature = (payload, expected) ->
-  # signature invalid if one is present but the other isn't
-  return false if expected? != process.env.WEBHOOK_SECRET?
-  # only verify if both are present
-  return true unless expected?
-
-  actual = crypto
-    .createHmac 'sha1', process.env.WEBHOOK_SECRET
-    .update JSON.stringify(payload)
-    .digest 'hex'
-
-  return expected == "sha1=#{actual}"
+helpers = require './helpers'
 
 
 # return an array of strings
@@ -56,10 +42,10 @@ createAuditIssueWrapper = (uri) ->
     requestCb = (err, _res, body) ->
       if _res.statusCode != 201
         # error, abort all subsequent calls
-        asyncCallback err
+        asyncCallback err, null
       else
-        # we're good, keep going with next call in async.eachSeries
-        asyncCallback()
+        # Report new issue number
+        asyncCallback null, body.number
 
     request.post {
       uri: uri,
@@ -69,24 +55,16 @@ createAuditIssueWrapper = (uri) ->
     }, requestCb
 
 
-postreceive = (req, res, next) ->
-  # ping event
-  if req.headers['x-github-event'] == 'ping'
-    console.log "ping event received.\n#{req.body.zen}"
-    res.status(204).end()
-    return
+auditOpened = (req, res, next) ->
+  return unless helpers.validateEvent 'push', req, res
 
-  # only deal with push events
-  if req.headers['x-github-event'] != 'push'
-    return
-
-  if not verify_signature req.body, req.headers['x-hub-signature']
+  unless verifySignature req.body, req.headers['x-hub-signature']
     console.log 'Signatures invalid aborting.'
     res.status(403).end()
 
   repo = req.body.repository.full_name
   q = { access_token: process.env.GITHUB_ACCESS_TOKEN }
-  uri = "https://api.github.com/repos/#{repo}/issues?#{qs.stringify(q)}"
+  uri = "https://api.github.com/repos/#{repo}/issues?#{qs.stringify q}"
 
   auditorCommitPair = _.map req.body.commits, (commit) ->
     # auditors = ['jez', '...']
@@ -98,15 +76,15 @@ postreceive = (req, res, next) ->
   audits = _.flatten auditorCommitPair
   # audits = [{auditor, commit}, {auditor, commit}, {...}]
 
-  createAuditIssue = createAuditIssueWrapper uri
+  createAuditIssue = createAuditIssueWrapper "#{issuesUri}"
 
   # serially fire off async issue-creation calls
-  async.eachSeries audits, createAuditIssue, (err) ->
-    if (err)
+  async.mapSeries audits, createAuditIssue, (err, issues) ->
+    if err
       console.log err
       res.status(500).end()
     else
       res.end()
 
 
-module.exports = postreceive
+module.exports = auditOpened

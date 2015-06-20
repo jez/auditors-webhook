@@ -5,6 +5,8 @@ request = require 'request'
 async = require 'async'
 qs = require 'querystring'
 
+audits = require './audits'
+
 router = express.Router()
 
 # GET home page.
@@ -43,6 +45,7 @@ router.get '/callback', (req, res, next) ->
   request.post {uri: uri, body: body, json: true}, callback
 
 
-router.post '/postreceive', require('./postreceive')
+router.post '/audit/opened', audits.opened
+router.post '/audit/closed', audits.closed
 
 module.exports = router
