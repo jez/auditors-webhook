@@ -126,6 +126,9 @@ on by
 We're almost there. Last up, we need to get an access token so we can use the
 GitHub API.
 
+> To get the appearance that these commits are being created by a bot, now is
+> the time to create a bot account. Use it when signing in below.
+
 1. Go to <http://MYAPP_NAME.herokuapp.com>
 1. Click "Login with GitHub"
 1. Authorize the application
@@ -230,6 +233,9 @@ $ foreman start
 
 We're almost there. We need to get an access token so we can use the
 GitHub API.
+
+> To get the appearance that these commits are being created by a bot, now is
+> the time to create a bot account. Use it when signing in below.
 
 1. Go to <http://localhost:5000>
 1. Click "Login with GitHub"
